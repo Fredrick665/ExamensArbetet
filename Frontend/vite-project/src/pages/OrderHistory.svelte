@@ -1,37 +1,118 @@
 <script lang="ts">
-  import type { Order } from "../utils/interfaces";
+  import type { Order, UpdateCartItem, Treatments } from "../utils/interfaces";
 
   let orders: Order[] = $state([]);
   let username = $state<string>(sessionStorage.getItem("username") || "");
+  let treatments: Treatments[] = $state([]);
 
-  async function fetchUserOrders() {
+  async function fetchTreatments(): Promise<void> {
+    try {
+      const response = await fetch("http://localhost:5000/api/products");
+      if (!response.ok) throw new Error("Failed to fetch products");
+      treatments = await response.json();
+    } catch (error) {
+      console.error("Error fetching treatments:", error);
+    }
+  }
+
+  async function fetchUserOrders(): Promise<void> {
     try {
       const token = sessionStorage.getItem("jwt");
-      if (!token) {
-        throw new Error("Token saknas! Se till att du är inloggad.");
-      }
-      const response = await fetch(
-        `http://localhost:5000/api/orders/${username}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (!token) throw new Error("Token saknas! Se till att du är inloggad.");
+      const response = await fetch(`http://localhost:5000/api/myorders`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
-      const data = await response.json();
+      const data: Order[] = await response.json();
+
+      if (treatments.length > 0) {
+        data.forEach((order) => {
+          order.items.forEach((item) => {
+            if (!item.name || !treatments.find((t) => t.name === item.name)) {
+              item.name = treatments[0].name;
+            }
+          });
+        });
+      }
+
       orders = data;
     } catch (error) {
       console.error("Error fetching user orders:", error);
     }
   }
 
+  async function updateMyOrder(
+    orderId: string,
+    items: UpdateCartItem[]
+  ): Promise<void> {
+    try {
+      const token = sessionStorage.getItem("jwt");
+      if (!token) return;
+
+      const filteredItems = items.map(({ name, quantity }) => ({
+        name,
+        quantity,
+      }));
+
+      const response = await fetch(
+        `http://localhost:5000/api/updateMyOrder/${orderId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ items: filteredItems }),
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Fel vid uppdatering:", responseData);
+        throw new Error("Kunde inte uppdatera order");
+      }
+
+      orders = orders.map((order) =>
+        order.orderId === orderId ? responseData : order
+      );
+    } catch (error) {
+      console.error("Error updating order:", error);
+    }
+  }
+
+  async function deleteMyOrder(orderId: string): Promise<void> {
+    try {
+      const token = sessionStorage.getItem("jwt");
+      if (!token) return;
+      const response = await fetch(
+        `http://localhost:5000/api/myorders/${orderId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Kunde inte ta bort order");
+      orders = orders.filter((order) => order.orderId !== orderId);
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
+  }
+
   $effect(() => {
     if (username) {
-      fetchUserOrders();
+      (async () => {
+        await fetchTreatments();
+        await fetchUserOrders();
+      })();
     }
   });
 </script>
@@ -48,22 +129,45 @@
             <ul class="order-history__item-list">
               {#each order.items as item}
                 <li class="order-history__item">
-                  <h2 class="order-history__item-name">{item.name}</h2>
+                  <select class="order-history__select" bind:value={item.name}>
+                    {#each treatments as treatment}
+                      <option
+                        class="order-history__option"
+                        value={treatment.name}
+                      >
+                        {treatment.name}
+                      </option>
+                    {/each}
+                  </select>
                   <p class="order-history__item-cost">
-                    Kostnad för en enskild behandling: {item.cost} kr
+                    Kostnad: {item.cost} kr
                   </p>
-                  <p class="order-history__item-quantity">
-                    Antal: {item.quantity}
-                  </p>
+                  <input
+                    type="number"
+                    bind:value={item.quantity}
+                    min="1"
+                    class="order-history__item-quantity"
+                  />
                   <p class="order-history__item-total">
                     Delkostnad: {item.cost * item.quantity} kr
                   </p>
                 </li>
               {/each}
             </ul>
-            <h2 class="order-history__total-cost">
-              Denna order kostar totalt: {order.total} kr
-            </h2>
+            <h2 class="order-history__total-cost">Totalt: {order.total} kr</h2>
+            <button
+              class="order-history__button order-history__button--update"
+              onclick={() => updateMyOrder(order.orderId, order.items)}
+            >
+              Spara ändringar
+            </button>
+
+            <button
+              class="order-history__button order-history__button--delete"
+              onclick={() => deleteMyOrder(order.orderId)}
+            >
+              Ta bort order
+            </button>
           </article>
         {/each}
       </ul>
@@ -190,12 +294,6 @@
     border-radius: 5px 0 0 5px;
   }
 
-  .order-history__item-name {
-    font-size: 1.6rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-  }
-
   .order-history__item-cost,
   .order-history__item-quantity,
   .order-history__item-total {
@@ -289,5 +387,61 @@
 
   .order-history__nav-button:hover {
     background: var(--primary-color);
+  }
+
+  .order-history__button {
+    background-color: var(--primary-color);
+    color: var(--neutral-color);
+    border: 2px solid var(--accent-color);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition:
+      background 0.3s,
+      transform 0.2s;
+    text-transform: uppercase;
+  }
+
+  .order-history__button:hover {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    transform: scale(1.05);
+  }
+
+  .order-history__button:active {
+    transform: scale(0.95);
+  }
+
+  .order-history__button--delete {
+    border-color: var(--secondary-accent-color);
+    background-color: var(--primary-color);
+  }
+
+  .order-history__button--delete:hover {
+    background-color: var(--primary-color);
+  }
+
+  .order-history__select {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    font-size: 1rem;
+    font-weight: bold;
+    transition:
+      border 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .order-history__select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
+    outline: none;
+  }
+
+  .order-history__option {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: bold;
   }
 </style>

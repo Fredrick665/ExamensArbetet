@@ -13,10 +13,13 @@ import {
 import {
   getOrders,
   getUserOrder,
+  getMyOrders,
   createOrder,
   updateOrder,
   deleteOrder,
   deleteAllOrders,
+  updateMyOrder,
+  deleteMyOrder,
 } from "../controllers/OrderController.js";
 import {
   getAllUsers,
@@ -48,6 +51,7 @@ router.get("/users", verifyToken, AdminAuth, getAllUsers);
 router.get("/orders", verifyToken, AdminAuth, getOrders);
 router.get("/orders/:username", verifyToken, AdminAuth, getUserOrder);
 router.get("/productsAdmin", verifyToken, AdminAuth, getProducts);
+router.get("/myorders", verifyToken, getMyOrders);
 
 router.post("/orders", verifyToken, createOrder);
 router.post("/users", validateUser, createUser);
@@ -62,12 +66,14 @@ router.put(
   updateRole
 );
 router.put("/products/:id", verifyToken, AdminAuth, updateProduct);
+router.put("/updateMyOrder/:orderId", verifyToken, updateMyOrder);
 router.put("/orders/:orderId", verifyToken, AdminAuth, updateOrder);
 
 router.delete("/users/:userId", verifyToken, AdminAuth, deleteUser);
 router.delete("/users", verifyToken, AdminAuth, deleteAllUsers);
 router.delete("/orders/:orderId", verifyToken, AdminAuth, deleteOrder);
 router.delete("/orders", verifyToken, AdminAuth, deleteAllOrders);
+router.delete("/myorders/:orderId", verifyToken, deleteMyOrder);
 router.delete("/products/:id", verifyToken, AdminAuth, deleteProduct);
 router.delete("/products", verifyToken, AdminAuth, deleteAllProducts);
 

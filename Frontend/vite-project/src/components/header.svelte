@@ -1,9 +1,10 @@
 <script lang="ts">
   import { routes } from "../routing/routes";
   import Bild5 from "../assets/bild5.jpeg";
+  import { push } from "svelte-spa-router";
 
   let routeEntries: string[] = $state([]);
-  let isLoggedIn = false;
+  let isLoggedIn = $state(false);
 
   function updateRoutes() {
     console.log("updateRoutes: Funktion körs...");
@@ -26,8 +27,6 @@
         routeEntries = Object.keys(routes);
       }
     }
-
-    console.log("updateRoutes: Uppdaterade routes:", routeEntries);
   }
 
   updateRoutes();
@@ -37,9 +36,8 @@
     return () => window.removeEventListener("login", listener);
   });
   async function logout() {
-    sessionStorage.removeItem("jwt");
-    sessionStorage.removeItem("userRole");
-    sessionStorage.removeItem("username");
+    sessionStorage.clear();
+    push("/");
     updateRoutes();
   }
 </script>
@@ -55,11 +53,13 @@
           </a>
         </li>
       {/each}
-      <li class="header__nav-item">
-        <button type="button" onclick={logout} class="logout-button">
-          Logout
-        </button>
-      </li>
+      {#if isLoggedIn}
+        <li class="header__nav-item">
+          <button type="button" onclick={logout} class="logout-button">
+            Logout
+          </button>
+        </li>
+      {/if}
     </ul>
   </nav>
 </header>

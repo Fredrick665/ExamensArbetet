@@ -4,7 +4,6 @@
     updateCart,
     finalizeOrder,
   } from "../utils/stores/Store.svelte";
-  let username: string = $state("");
 </script>
 
 <main>
@@ -18,7 +17,7 @@
         </p>
       {:else}
         <ul class="confirmed-orders__list">
-          {#each cart as item, index}
+          {#each cart as item}
             <li class="confirmed-orders__item">
               <h2 class="confirmed-orders__item-name">{item.name}</h2>
               <p class="confirmed-orders__item-cost">
@@ -44,12 +43,6 @@
               </button>
             </li>
           {/each}
-          <input
-            id="username"
-            type="text"
-            bind:value={username}
-            placeholder="Skriv ditt användarnamn"
-          />
           <nav class="confirmed-orders__nav">
             <a href="#/Orderhistory" class="confirmed-orders__link">
               <button

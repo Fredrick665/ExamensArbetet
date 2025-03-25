@@ -38,3 +38,15 @@ export const loginSchema = Joi.object({
 export const updateRoleSchema = Joi.object({
   role: Joi.string().valid("user", "admin").required(),
 });
+export const updateMyorderSchema = Joi.object({
+  items: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().required(),
+        quantity: Joi.number().integer().min(1).required(),
+      })
+    )
+    .min(1)
+    .required(),
+});
+// Modulera upp det här med en fil för varje schema

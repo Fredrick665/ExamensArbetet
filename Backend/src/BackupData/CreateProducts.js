@@ -54,7 +54,7 @@ async function createInitialData() {
     const UserCollection = db.collection("users");
     const OrderCollection = db.collection("orders");
 
-    console.log("Database connection established.");
+    console.log("Databasen är kopplad!.");
 
     const superAdmin = {
       userId: uuidv4(),
@@ -67,37 +67,44 @@ async function createInitialData() {
       username: "SuperAdmin",
     });
     if (!existingAdmin) {
-      console.log("Inserting SuperAdmin user...");
+      console.log("SuperAdmin försöker läggas in i databasen");
       const adminResult = await UserCollection.insertOne(superAdmin);
-      console.log(`SuperAdmin inserted: ${adminResult.insertedId}`);
+      console.log(
+        `SuperAdmin är tillagd i databasen!: ${adminResult.insertedId}`
+      );
     } else {
-      console.log("SuperAdmin user already exists.");
+      console.log("SuperAdmin finns redan.");
     }
 
     console.log("Inserting products...");
     for (const product of products) {
       console.log(
-        `Checking if product exists: ${product.name} (ID: ${product.productId})`
+        `Kollar om produkten existerar: ${product.name} (ID: ${product.productId})`
       );
       const existingProduct = await ProductCollection.findOne({
         name: product.name,
       });
       if (!existingProduct) {
         console.log(
-          `Adding product: ${product.name} (ID: ${product.productId})`
+          `Lägger till produkten: ${product.name} (ID: ${product.productId})`
         );
         const productResult = await ProductCollection.insertOne(product);
-        console.log(`Product inserted with ID: ${productResult.insertedId}`);
+        console.log(
+          `Produkten har fått följande id: ${productResult.insertedId}`
+        );
       } else {
-        console.log(`Product already exists: ${product.name}`);
+        console.log(`Produkten finns redan: ${product.name}`);
       }
     }
-    console.log("All products checked and added successfully.");
+    console.log("Alla produkter tillagda!");
 
-    console.log("Generating mock orders...");
+    console.log("Skapar mockordrar...");
     for (let i = 0; i < 3 + Math.floor(Math.random() * 2); i++) {
+      // Generera ett unikt id som ska användas både som _id och orderId
+      const id = uuidv4();
       const order = {
-        orderId: uuidv4(),
+        _id: id,
+        orderId: id,
         items: [
           products[Math.floor(Math.random() * products.length)],
           products[Math.floor(Math.random() * products.length)],
@@ -109,11 +116,11 @@ async function createInitialData() {
       console.log(`Order ${i + 1} inserted with ID: ${orderResult.insertedId}`);
     }
 
-    console.log("Mock orders added successfully.");
+    console.log("Mock ordrar tillagda!");
   } catch (error) {
-    console.error("Error inserting mock data:", error);
+    console.error("Error! Yay!:", error);
   } finally {
-    console.log("Script execution completed.");
+    console.log("Allt funkar!");
     process.exit();
   }
 }

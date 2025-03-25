@@ -27,7 +27,7 @@
     });
     setTimeout(() => {
       showNotification = false;
-    }, 2000);
+    }, 30000);
   });
 </script>
 

@@ -25,3 +25,7 @@ export interface User {
   password: string;
   role: string;
 }
+export interface UpdateCartItem {
+  name: string;
+  quantity: number;
+}

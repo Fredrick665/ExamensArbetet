@@ -73,15 +73,22 @@
       if (!token) {
         throw new Error("Token saknas! Se till att du är inloggad som admin.");
       }
-      const updateData = {
-        items: [
-          {
-            name: itemName,
-            cost: Number(itemCost),
-            quantity: Number(itemQuantity),
-          },
-        ],
-      };
+
+      const currentOrder = orders.find(
+        (order) => order.orderId === orderIdToUpdate
+      );
+
+      if (!currentOrder) {
+        throw new Error("Ordern hittades inte.");
+      }
+      const updatedItems = currentOrder.items.map((item) => ({
+        name: itemName || item.name,
+        cost: itemCost !== "" ? Number(itemCost) : item.cost,
+        quantity: itemQuantity !== "" ? Number(itemQuantity) : item.quantity,
+      }));
+
+      const updateData = { items: updatedItems };
+
       const response = await fetch(
         `http://localhost:5000/api/orders/${orderIdToUpdate}`,
         {
@@ -93,14 +100,15 @@
           body: JSON.stringify(updateData),
         }
       );
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
-      const data = await response.json();
     } catch (error) {
       console.error("Fel vid uppdatering av order:", error);
     }
   }
+
   async function deleteOrder() {
     try {
       const token = sessionStorage.getItem("jwt");
@@ -415,7 +423,7 @@
   }
 
   .order__card:hover {
-    transform: scale(1.05);
+    transform: scale(1.025);
   }
 
   .order__card-title {

@@ -9,11 +9,6 @@
 
   async function loginUser(event: Event): Promise<void> {
     event.preventDefault();
-    console.log(
-      "loginUser: Hämtar inloggningsuppgifter för användare:",
-      username
-    );
-
     try {
       const response = await fetch("http://localhost:5000/api/login", {
         method: "POST",
@@ -21,9 +16,7 @@
         body: JSON.stringify({ username, password }),
       });
 
-      console.log("loginUser: Svar från servern:", response);
       const data = await response.json();
-      console.log("loginUser: Parsat svar från servern:", data);
 
       if (response.ok && data.token) {
         sessionStorage.setItem("jwt", data.token);
@@ -32,50 +25,30 @@
 
         loggedInUser = data.user;
         message = "Inloggning lyckades!";
-        console.log("loginUser: Inloggning lyckades, användare:", data.user);
-
-        console.log("loginUser: Skickar login-event...");
         window.dispatchEvent(new CustomEvent("login"));
-        console.log("loginUser: Login-event skickat!");
-
-        console.log("loginUser: User Role efter inloggning:", data.user.role);
       } else {
         message = data.message || "Inloggning misslyckades.";
-        console.error(
-          "loginUser: Inloggning misslyckades med meddelandet:",
-          message
-        );
       }
     } catch (error) {
-      console.error("loginUser: Fel vid inloggning:", error);
       message = "Ett fel uppstod under inloggningen.";
     }
   }
 
   function fetchUsername(): void {
     const storedUsername = sessionStorage.getItem("username");
-    console.log(
-      "fetchUsername: Hämtat användarnamn från sessionStorage:",
-      storedUsername
-    );
   }
 
   async function handleLogin(event: Event): Promise<void> {
     event.preventDefault();
-    console.log("handleLogin: Initierar inloggning");
     await loginUser(event);
     fetchUsername();
 
     if (loggedInUser) {
-      console.log(
-        "handleLogin: Inloggning verifierad, navigerar om 2 sekunder"
-      );
       setTimeout(() => {
-        console.log("handleLogin: Navigering påbörjas");
         push("/");
       }, 2000);
     } else {
-      console.warn("handleLogin: Inloggning misslyckades, navigering avbryts");
+      window.alert("Navigering avbröts inlogg misslyckades");
     }
   }
 </script>
@@ -85,7 +58,6 @@
     <header class="login__header">
       <h1 class="login__title">Login</h1>
     </header>
-
     <form class="login__form" onsubmit={handleLogin}>
       <input
         type="text"
@@ -105,7 +77,6 @@
     {#if message}
       <p class="login__message">{message}</p>
     {/if}
-
     {#if loggedInUser}
       <p class="login__user">Inloggad som: {loggedInUser.username}</p>
     {/if}
