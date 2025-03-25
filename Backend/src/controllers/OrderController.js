@@ -1,6 +1,7 @@
 import { handleError } from "../utils/ErrorHandler.js";
 import validateRequest from "../Validators/ValidateRequest.js";
-import { orderSchema, updateMyorderSchema } from "../models/Schemas.js";
+import { orderSchema } from "../models/OrderSchema.js";
+import { updateMyorderSchema } from "../models/UpdateMyOrderSchema.js";
 import db from "../db/db.js";
 
 export const getOrders = async (req, res) => {

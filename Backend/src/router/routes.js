@@ -5,11 +5,9 @@ import { AdminAuth } from "../middlewares/AdminAuth.js";
 import { loginUser } from "../controllers/LoginController.js";
 import validateRequest from "../Validators/ValidateRequest.js";
 import { validateSchema } from "../Validators/ValidateSchema.js";
-import {
-  loginSchema,
-  updateRoleSchema,
-  productSchema,
-} from "../models/Schemas.js";
+import { loginSchema } from "../models/LoginSchema.js";
+import { updateRoleSchema } from "../models/updateRoleSchema.js";
+import { productSchema } from "../models/ProductSchema.js";
 import {
   getOrders,
   getUserOrder,

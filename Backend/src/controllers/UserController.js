@@ -1,6 +1,6 @@
 import db from "../db/db.js";
 import ValidateRequest from "../Validators/ValidateRequest.js";
-import { userSchema } from "../models/Schemas.js";
+import { userSchema } from "../models/UserSchema.js";
 
 export const validateUser = ValidateRequest(userSchema);
 export const getAllUsers = async (req, res) => {

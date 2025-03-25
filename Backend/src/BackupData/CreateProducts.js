@@ -48,7 +48,7 @@ const products = [
 
 async function createInitialData() {
   try {
-    console.log("Connecting to database...");
+    console.log("Ansluter till databasen");
 
     const ProductCollection = db.collection("products");
     const UserCollection = db.collection("users");
@@ -76,7 +76,7 @@ async function createInitialData() {
       console.log("SuperAdmin finns redan.");
     }
 
-    console.log("Inserting products...");
+    console.log("Lägger till produkter...");
     for (const product of products) {
       console.log(
         `Kollar om produkten existerar: ${product.name} (ID: ${product.productId})`
@@ -101,20 +101,33 @@ async function createInitialData() {
     console.log("Skapar mockordrar...");
     for (let i = 0; i < 3 + Math.floor(Math.random() * 2); i++) {
       const id = uuidv4();
+      const orderItems = [
+        {
+          ...products[Math.floor(Math.random() * products.length)],
+          quantity: 1,
+        },
+        {
+          ...products[Math.floor(Math.random() * products.length)],
+          quantity: 1,
+        },
+      ];
+      const total = orderItems.reduce(
+        (acc, item) => acc + item.cost * item.quantity,
+        0
+      );
+
       const order = {
         _id: id,
         orderId: id,
-        items: [
-          products[Math.floor(Math.random() * products.length)],
-          products[Math.floor(Math.random() * products.length)],
-        ],
+        items: orderItems,
+        total: total,
       };
-
-      console.log(`Inserting Order ${i + 1} with ID: ${order.orderId}`);
+      console.log(`Lägger till ${i + 1} med ID: ${order.orderId}`);
       const orderResult = await OrderCollection.insertOne(order);
-      console.log(`Order ${i + 1} inserted with ID: ${orderResult.insertedId}`);
+      console.log(
+        `Order ${i + 1} tillagd i databasen: ${orderResult.insertedId}`
+      );
     }
-
     console.log("Mock ordrar tillagda!");
   } catch (error) {
     console.error("Error! Yay!:", error);

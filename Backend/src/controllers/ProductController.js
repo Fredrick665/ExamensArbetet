@@ -1,7 +1,7 @@
 import db from "../db/db.js";
 import validateRequest from "../Validators/ValidateRequest.js";
 import { validateSchema } from "../Validators/ValidateSchema.js";
-import { productSchema } from "../models/Schemas.js";
+import { productSchema } from "../models/ProductSchema.js";
 import { handleError } from "../utils/ErrorHandler.js";
 
 export const getProducts = async (req, res) => {

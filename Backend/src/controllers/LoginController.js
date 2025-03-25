@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { handleError } from "../utils/ErrorHandler.js";
-import { loginSchema } from "../models/Schemas.js";
+import { loginSchema } from "../models/LoginSchema.js";
 import validateRequest from "../Validators/ValidateRequest.js";
 import db from "../db/db.js";
 export const loginUser = [
