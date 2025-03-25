@@ -100,7 +100,6 @@ async function createInitialData() {
 
     console.log("Skapar mockordrar...");
     for (let i = 0; i < 3 + Math.floor(Math.random() * 2); i++) {
-      // Generera ett unikt id som ska användas både som _id och orderId
       const id = uuidv4();
       const order = {
         _id: id,
