@@ -66,7 +66,6 @@
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("Produkt skapad:", data);
     } catch (error) {
       console.error("Fel vid skapande av produkt:", error);
     }
@@ -127,7 +126,6 @@
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("Produkt borttagen:", data);
     } catch (error) {
       console.error("Fel vid borttagning av produkt:", error);
     }
@@ -149,7 +147,6 @@
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      console.log("Alla produkter borttagna:", data);
     } catch (error) {
       console.error("Fel vid borttagning av alla produkter:", error);
     }

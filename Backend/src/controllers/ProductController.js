@@ -97,10 +97,7 @@ export const updateProduct = [
 
 export const deleteProduct = async (req, res) => {
   try {
-    console.log("Received delete request for product ID:", req.params.id);
-
     const validProductId = req.params.id;
-    console.log("Validated Product ID:", validProductId);
 
     const productFromDB = await db
       .collection("products")
@@ -113,22 +110,10 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    console.log("Found product in DB before delete:", productFromDB);
-    console.log("Delete query:", { productId: validProductId });
-
     const deletedProduct = await db
       .collection("products")
       .findOneAndDelete({ productId: validProductId });
 
-    console.log("Delete operation result:", deletedProduct);
-    if (!deletedProduct) {
-      console.error("Error: Product not found after deletion attempt.");
-      return res
-        .status(404)
-        .json({ message: "Product not found after deletion attempt." });
-    }
-
-    console.log("Deleted product:", deletedProduct);
     res.status(200).json({ message: "Product deleted successfully." });
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -138,9 +123,7 @@ export const deleteProduct = async (req, res) => {
 
 export const deleteAllProducts = async (req, res) => {
   try {
-    console.log("Deleting all products...");
     await db.collection("products").deleteMany({});
-    console.log("All products deleted.");
     res.status(200).json({ message: "All products deleted successfully." });
   } catch (error) {
     console.error("Error deleting all products:", error);

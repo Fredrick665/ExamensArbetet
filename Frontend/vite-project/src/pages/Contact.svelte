@@ -22,7 +22,7 @@
           </li>
           <li class="contact__info-item">
             <p>Adress:</p>
-             Exempelgatan 123, 123 45 Stad
+            Exempelgatan 123, 123 45 Stad
           </li>
         </ul>
       </article>
@@ -46,7 +46,6 @@
         </form>
       </article>
     </article>
-    <section></section>
   </section>
 </main>
 

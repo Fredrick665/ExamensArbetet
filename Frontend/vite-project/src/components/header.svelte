@@ -7,9 +7,7 @@
   let isLoggedIn = $state(false);
 
   function updateRoutes() {
-    console.log("updateRoutes: Funktion körs...");
     isLoggedIn = !!sessionStorage.getItem("username");
-    console.log("updateRoutes: Är användaren inloggad?", isLoggedIn);
 
     if (!isLoggedIn) {
       routeEntries = Object.keys(routes).filter(
@@ -17,7 +15,6 @@
       );
     } else {
       const userRole = sessionStorage.getItem("userRole");
-      console.log("updateRoutes: User Role:", userRole);
 
       if (userRole === "user") {
         routeEntries = Object.keys(routes)

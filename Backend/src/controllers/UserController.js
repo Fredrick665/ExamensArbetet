@@ -1,6 +1,7 @@
 import db from "../db/db.js";
 import ValidateRequest from "../Validators/ValidateRequest.js";
 import { userSchema } from "../models/UserSchema.js";
+import { handleError } from "../utils/ErrorHandler.js";
 
 export const validateUser = ValidateRequest(userSchema);
 export const getAllUsers = async (req, res) => {
@@ -19,13 +20,6 @@ export const createUser = async (req, res) => {
   const { username, password, role } = req.validatedBody;
 
   try {
-    const adminCount = await db
-      .collection("users")
-      .countDocuments({ role: "admin" });
-    if (adminCount > 0 && role === "admin") {
-      return res.status(400).json({ message: "Only one admin is allowed." });
-    }
-
     const newUser = { ...req.validatedBody, _id: req.validatedBody.userId };
 
     const existingUser = await db
